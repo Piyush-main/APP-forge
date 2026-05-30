@@ -40,7 +40,7 @@ export interface MetricDef {
   description?: string;
 }
 
-export interface PageAction =
+export type PageAction =
   | "create" | "edit" | "delete"
   | "import_csv" | "export_csv"
   | "view" | "duplicate";
