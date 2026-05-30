@@ -16,25 +16,33 @@ export async function GET(req: NextRequest) {
   });
   const appIds = userApps.map((a) => a.id);
 
-  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 30 days
+  if (appIds.length === 0) {
+    return ok({ period: "30d", events: {}, workflows: {}, appCount: 0 });
+  }
 
-  const [events, workflowLogs] = await prisma.$transaction([
-    prisma.analyticsEvent.groupBy({
-      by:    ["event"],
-      where: { appId: { in: appIds }, createdAt: { gte: since } },
-      _count: { event: true },
-    }),
-    prisma.workflowLog.groupBy({
-      by:    ["result"],
-      where: { appId: { in: appIds }, createdAt: { gte: since } },
-      _count: { result: true },
-    }),
-  ]);
+  const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  // Use raw queries to avoid Prisma groupBy circular type bug
+  const eventRows = await prisma.$queryRawUnsafe<{ event: string; count: bigint }[]>(
+    `SELECT event, COUNT(*) as count FROM analytics_events
+     WHERE app_id = ANY($1::text[]) AND created_at >= $2
+     GROUP BY event`,
+    appIds,
+    since,
+  ).catch(() => [] as { event: string; count: bigint }[]);
+
+  const workflowRows = await prisma.$queryRawUnsafe<{ result: string; count: bigint }[]>(
+    `SELECT result, COUNT(*) as count FROM workflow_logs
+     WHERE app_id = ANY($1::text[]) AND created_at >= $2
+     GROUP BY result`,
+    appIds,
+    since,
+  ).catch(() => [] as { result: string; count: bigint }[]);
 
   return ok({
     period:    "30d",
-    events:    Object.fromEntries(events.map((e) => [e.event, e._count.event])),
-    workflows: Object.fromEntries(workflowLogs.map((w) => [w.result, w._count.result])),
+    events:    Object.fromEntries(eventRows.map((e) => [e.event, Number(e.count)])),
+    workflows: Object.fromEntries(workflowRows.map((w) => [w.result, Number(w.count)])),
     appCount:  appIds.length,
   });
 }
