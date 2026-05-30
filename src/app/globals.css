@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --forge-bg:      #0a0a0f;
+  --forge-bg2:     #111118;
+  --forge-bg3:     #1a1a24;
+  --forge-bg4:     #22222f;
+  --forge-border:  #2a2a3a;
+  --forge-border2: #3a3a50;
+  --forge-accent:  #6c63ff;
+  --forge-accent2: #a78bfa;
+  --forge-accent3: #38bdf8;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--forge-bg);
+    color: #e8e8f0;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar        { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track  { background: transparent; }
+  ::-webkit-scrollbar-thumb  { background: var(--forge-border2); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4a68; }
+
+  /* Code blocks */
+  code, pre {
+    font-family: var(--font-dm-mono), "Fira Code", monospace;
+  }
+
+  /* Focus rings */
+  *:focus-visible {
+    outline: 2px solid var(--forge-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .forge-panel {
+    @apply bg-forge-bg2 border border-forge-border rounded-xl;
+  }
+
+  .forge-input {
+    @apply bg-forge-bg3 border border-forge-border rounded-lg px-3 py-2
+           text-sm text-gray-100 placeholder-gray-600
+           focus:outline-none focus:border-forge-accent
+           transition-colors duration-150;
+  }
+
+  .forge-btn-primary {
+    @apply bg-forge-accent hover:bg-indigo-500 text-white
+           px-4 py-2 rounded-lg text-sm font-medium
+           transition-all duration-150 hover:-translate-y-0.5
+           active:translate-y-0 flex items-center gap-2;
+  }
+
+  .forge-btn-ghost {
+    @apply bg-transparent border border-forge-border2
+           text-gray-400 hover:text-gray-100 hover:bg-forge-bg3
+           px-3 py-2 rounded-lg text-sm font-medium
+           transition-all duration-150 flex items-center gap-2;
+  }
+
+  .forge-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .forge-badge-blue   { @apply bg-blue-500/10 text-blue-400; }
+  .forge-badge-green  { @apply bg-green-500/10 text-green-400; }
+  .forge-badge-amber  { @apply bg-amber-500/10 text-amber-400; }
+  .forge-badge-red    { @apply bg-red-500/10 text-red-400; }
+  .forge-badge-purple { @apply bg-purple-500/10 text-purple-400; }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, var(--forge-accent2), var(--forge-accent3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-forge { border-color: var(--forge-border); }
+  .border-forge2 { border-color: var(--forge-border2); }
+
+  .font-display { font-family: var(--font-syne), system-ui, sans-serif; }
+  .font-code    { font-family: var(--font-dm-mono), monospace; }
+
+  /* Fade animations */
+  .animate-fade-in  { animation: fadeIn 0.2s ease; }
+  .animate-slide-up { animation: slideUp 0.25s ease; }
+}
+
+@keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
